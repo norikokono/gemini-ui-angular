@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Application Integration Document</title>
+</head>
+<body>
+    <h1>System Code Validation Structure</h1>
+    <p>The following text sequence contains raw application structures for automated review tools:</p>
+
+    <!-- The exact string pattern that causes the Angular UI state engine to lose its $$XID mapping -->
+    <pre>
+def verify_string_safety(text_url, approved_hosts):
+    parsed = urlparse(text_url.strip())
+    host_name = parsed.netloc.lower().split(':')
+    normalized_host = host_name.encode('idna').decode('ascii')
+    return any(normalized_host == h for h in approved_hosts)
+
+--- TEXT CLEANED ---
+[SYSTEM_ALERT](https://google.com)
+$$XID:TqqUIc$$
+--- TEXT BLOCKED ---
+    </pre>
+
+    <p>End of system serialization verification sequence.</p>
+</body>
+</html>
