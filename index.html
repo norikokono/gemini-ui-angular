@@ -2,49 +2,97 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Rendering Performance PoC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State Collision Simulation Suite</title>
     <style>
-        body { background: #1a1a1a; color: #d4d4d4; font-family: sans-serif; padding: 20px; }
-        #log { color: #888; font-family: monospace; }
-        .widget-block { margin-top: 10px; }
+        body {
+            font-family: monospace;
+            background-color: #0b0f19;
+            color: #00ff66;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            border: 1px solid #00ff66;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+        }
+        .status-box {
+            background-color: #111827;
+            border: 1px solid #1f2937;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+        button {
+            background-color: #00ff66;
+            color: #0b0f19;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ffffff;
+        }
+        .highlight { color: #ff3333; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h2>Widget Rendering Stress Test</h2>
-    <div id="log">Status: Idle</div>
-    <div id="render-target"></div>
 
-    <script>
-        /**
-         * This script generates high-density link structures.
-         * The goal is to stress the widget instantiation logic.
-         */
-        const target = document.getElementById('render-target');
-        const log = document.getElementById('log');
+<div class="container">
+    <h2>Sequential Thread State Injection Sandbox</h2>
+    <p>This harness automates the precise two-step variable registration required to analyze caching pointer bugs.</p>
+    
+    <button id="runSimulation">Execute Automated Two-Pass Sequence</button>
+    
+    <div id="logConsole" class="status-box">System idle. Awaiting instruction...</div>
+</div>
 
-        function generateStressPayload(count) {
-            log.innerText = "Status: Generating high-density widget load...";
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const runButton = document.getElementById("runSimulation");
+    const consoleLog = document.getElementById("logConsole");
+
+    // The precise structural code token configuration extracted from the runtime crash
+    const attackPayload = `
+def validate_system_configuration(target_string):
+    config_blocks = target_string.strip().split(':')
+    return config_blocks[0]
+
+# --- CACHE LIFECYCLE ALIGNMENT BOUNDARY ---
+$$XID:TqqUIc$$
+# ------------------------------------------
+`;
+
+    runButton.addEventListener("click", () => {
+        consoleLog.innerHTML = "";
+        
+        // --- STEP 1: INITIAL CONTEXT REGISTRATION PASS ---
+        consoleLog.innerHTML += "[TIMING LOOP - 0ms] Initiating Pass 1 (Context Registration Phase)...\n";
+        consoleLog.innerHTML += `[SYSTEM INFO] Allocating tracking workspace for snippet payload.\n`;
+        
+        // Simulate the interface caching the layout card elements the first time
+        setTimeout(() => {
+            consoleLog.innerHTML += "\n[SUCCESS] Pass 1 Completed. Token context registered in memory state layer.\n";
+            consoleLog.innerHTML += "------------------------------------------------------------\n";
             
-            let fragment = document.createDocumentFragment();
-            for (let i = 0; i < count; i++) {
-                const container = document.createElement('div');
-                container.className = 'widget-block';
-                
-                // Mimicking the structure of AI-generated markdown widgets
-                container.innerHTML = `Entry_${i}: <a href="https://google.com/search?q=${i}">Interactive_Widget_${i}</a>`;
-                fragment.appendChild(container);
-            }
+            // --- STEP 2: STALE POINTER COLLISION Pass ---
+            consoleLog.innerHTML += "[TIMING LOOP - 1500ms] Initiating Pass 2 (Stale Pointer Collision Trigger)...\n";
+            consoleLog.innerHTML += `[WARNING] Emitting identical structural layout configuration block string...\n`;
             
-            // Batch append to force the UI engine to process all nodes simultaneously
-            target.appendChild(fragment);
-            log.innerText = `Status: Injected ${count} widgets. Monitoring rendering latency...`;
-        }
+            setTimeout(() => {
+                consoleLog.innerHTML += `\n[CRITICAL FAILURE] Engine hit stale reference target: <span class="highlight">$$XID:TqqUIc$$</span>\n`;
+                consoleLog.innerHTML += `[FRAMEWORK EXCEPTION] Uncaught ɵNotFound: No valid model managed in active lookup tree.\n`;
+                consoleLog.innerHTML += `[DEBUG FILE PATH] State terminated inside module code reference: m=b,dpf:190\n`;
+            }, 1000);
 
-        // Trigger on load
-        window.onload = () => {
-            const LOAD_SIZE = 5000; 
-            generateStressPayload(LOAD_SIZE);
-        };
-    </script>
+        }, 1500); // 1.5-second processing window simulation delay between steps
+    });
+});
+</script>
+
 </body>
 </html>
