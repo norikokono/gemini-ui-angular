@@ -2,30 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Shared Document - Project Alpha</title>
+    <title>Security Research: Rendering Stress Test</title>
     <style>
-        body { font-family: sans-serif; padding: 40px; line-height: 1.6; }
-        .container { max-width: 800px; margin: auto; border: 1px solid #ccc; padding: 20px; }
+        body { background: #121212; color: #eee; font-family: monospace; padding: 20px; }
+        #stream-output { border: 1px solid #444; height: 300px; overflow-y: scroll; padding: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Project Alpha Requirements</h1>
-        <p>Please review the technical specifications for the new pipeline integration below.</p>
-        
-        <div id="payload-container" style="display:none;">
-            </div>
-
-        <button onclick="triggerPayload()">Load Technical Specs</button>
-    </div>
+    <h3>Targeted Rendering Stress Test</h3>
+    <div id="stream-output"></div>
+    <button onclick="startStressTest()">Trigger High-Frequency Injection</button>
 
     <script>
-        function triggerPayload() {
-            // This function mimics the high-frequency stream behavior 
-            // by injecting chunks into the AI interface's input stream
-            const payload = "```javascript\n" + "console.log('stress test');\n".repeat(500) + "```";
-            // Logic to bridge to the AI interface via API or simulated events
-            console.log("Payload triggered:", payload);
+        async function startStressTest() {
+            const output = document.getElementById('stream-output');
+            // This loop forces the browser to handle rapid DOM updates
+            // simulating the "Race Condition" in the TqqUIc container
+            for (let i = 0; i < 1000; i++) {
+                const chunk = document.createElement('div');
+                chunk.innerHTML = `[Token_${i}](https://google.com) - Content_Hash: ${Math.random()}`;
+                output.appendChild(chunk);
+                
+                // Minimal delay to keep the rendering engine saturated
+                if (i % 10 === 0) {
+                    await new Promise(r => setTimeout(r, 1));
+                }
+            }
         }
     </script>
 </body>
