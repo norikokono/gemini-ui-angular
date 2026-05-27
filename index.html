@@ -2,39 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Renderer Stress Test</title>
+    <title>Rendering Performance PoC</title>
+    <style>
+        body { background: #1a1a1a; color: #d4d4d4; font-family: sans-serif; padding: 20px; }
+        #log { color: #888; font-family: monospace; }
+        .widget-block { margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <div id="target-container"></div>
+    <h2>Widget Rendering Stress Test</h2>
+    <div id="log">Status: Idle</div>
+    <div id="render-target"></div>
 
     <script>
         /**
-         * This script aggressively injects malformed-but-valid markdown
-         * to force the DOM rendering engine into an unstable state.
+         * This script generates high-density link structures.
+         * The goal is to stress the widget instantiation logic.
          */
-        const container = document.getElementById('target-container');
-        let sessionID = 0;
+        const target = document.getElementById('render-target');
+        const log = document.getElementById('log');
 
-        function triggerRaceCondition() {
-            // High-frequency injection cycle
-            setInterval(() => {
-                for (let i = 0; i < 20; i++) {
-                    const el = document.createElement('div');
-                    // Injecting an XID-style ID to conflict with the target's internal mapping
-                    el.id = `TqqUIc_${sessionID++}`;
-                    el.innerHTML = `[Token_${sessionID}](https://google.com) - ${Math.random().toString(36)}`;
-                    container.appendChild(el);
-                }
+        function generateStressPayload(count) {
+            log.innerText = "Status: Generating high-density widget load...";
+            
+            let fragment = document.createDocumentFragment();
+            for (let i = 0; i < count; i++) {
+                const container = document.createElement('div');
+                container.className = 'widget-block';
                 
-                // Triggers immediate garbage collection stress
-                if (sessionID > 5000) {
-                    container.innerHTML = "";
-                    sessionID = 0;
-                }
-            }, 5); // 5ms interval to saturate the browser main thread
+                // Mimicking the structure of AI-generated markdown widgets
+                container.innerHTML = `Entry_${i}: <a href="https://google.com/search?q=${i}">Interactive_Widget_${i}</a>`;
+                fragment.appendChild(container);
+            }
+            
+            // Batch append to force the UI engine to process all nodes simultaneously
+            target.appendChild(fragment);
+            log.innerText = `Status: Injected ${count} widgets. Monitoring rendering latency...`;
         }
 
-        window.onload = triggerRaceCondition;
+        // Trigger on load
+        window.onload = () => {
+            const LOAD_SIZE = 5000; 
+            generateStressPayload(LOAD_SIZE);
+        };
     </script>
 </body>
 </html>
